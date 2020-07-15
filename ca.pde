@@ -1,5 +1,5 @@
 static final int SIZE = 16;
-static final int NUM_GENERATIONS = 128;
+static final int NUM_GENERATIONS = 64;
 static final int BOX_SIZE = 1;
 
 boolean[][] cells = new boolean[NUM_GENERATIONS][SIZE*SIZE];
@@ -116,7 +116,7 @@ boolean automaton(int[] kernel, boolean[] space) {
 
 void reorientCamera(int generation) {
   camera(
-    float(BOX_SIZE*SIZE)/2.0, float(BOX_SIZE*SIZE)*-2, float(BOX_SIZE*NUM_GENERATIONS)/2.0,
+    float(BOX_SIZE*SIZE)/2.0, float(BOX_SIZE*SIZE)*-2/tan(PI/6), float(BOX_SIZE*NUM_GENERATIONS)/2.0,
     float(BOX_SIZE*SIZE)/2.0, float(BOX_SIZE*SIZE)/2.0, float(BOX_SIZE*generation)/2.0,
     0, 0, -1
   );
