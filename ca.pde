@@ -116,14 +116,21 @@ boolean automaton(int[] neighborhood, boolean[] space) {
 
 void reorientCamera(int generation) {
   camera(
-    float(BOX_SIZE*SIZE)/2.0, float(BOX_SIZE*SIZE)*-2/tan(PI/6), float(BOX_SIZE*NUM_GENERATIONS)/2.0,
-    float(BOX_SIZE*SIZE)/2.0, float(BOX_SIZE*SIZE)/2.0, float(BOX_SIZE*generation)/2.0,
+    // Camera origin
+    0,
+    float(BOX_SIZE*SIZE)*-2/tan(PI/6),
+    float(BOX_SIZE*generation)*0.75 + BOX_SIZE*32,
+    // Camera target
+    0,
+    0,
+    float(BOX_SIZE*generation)*0.75,
+    // Up-axis
     0, 0, -1
   );
 }
 
 void setup() {
-  size(128, 128, P3D);
+  size(512, 512, P3D);
   frameRate(20);
 
   println("computing");
@@ -140,6 +147,12 @@ void setup() {
     }
   }
   println("done");
+
+  {
+    float fov = PI/3.0;
+    float cameraZ = (height/2.0) / tan(fov/2.0);
+    perspective(fov, float(width)/float(height), cameraZ/20.0, cameraZ*10.0);
+  }
 }
 
 void draw() {
@@ -154,13 +167,18 @@ void draw() {
 
 void draw3D(int generation) {
   // println("generation: "+generation);
+  ambientLight(81, 102, 126);
+  directionalLight(200, 200, 200, -1, 0, -0.5);
+  noStroke();
   reorientCamera(generation);
-  background(128);
+  background(0);
   for (int plane = 0; plane <= generation; plane++) {
     for (int row = 0; row < SIZE; row++) {
       for (int col = 0; col < SIZE; col++) {
         if (cells[plane][row*SIZE+col]) {
           pushMatrix();
+          rotateZ((float(mouseX)/512.0 - 256.0) * PI * -1);
+          translate(BOX_SIZE * SIZE / -2, BOX_SIZE * SIZE / -2);
           translate(BOX_SIZE * row, BOX_SIZE * col, BOX_SIZE * plane);
           box(BOX_SIZE);
           popMatrix();
