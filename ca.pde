@@ -47,7 +47,7 @@ boolean[][] cells = new boolean[NUM_GENERATIONS][SIZE*SIZE];
 //   }
 // }
 
-int[] genKernel2D(int x, int y, int size) {
+int[] neighborhood2D(int x, int y, int size) {
   int[] res = new int[9];
   int left = (size + x - 1) % size;
   int right = (x + 1) % size;
@@ -65,7 +65,7 @@ int[] genKernel2D(int x, int y, int size) {
   return res;
 }
 
-int[] genKernel1D(int x, int size) {
+int[] neighborhood1D(int x, int size) {
   int[] res = new int[3];
   res[0] = (size + x - 1) % size;
   res[1] = x;
@@ -73,17 +73,17 @@ int[] genKernel1D(int x, int size) {
   return res;
 }
 
-int evalKernel(int[] kernel, boolean[] space) {
+int evalNeighborhood(int[] neighborhood, boolean[] space) {
   int value = 0;
-  for (int idx : kernel) {
+  for (int idx : neighborhood) {
     value = value << 1;
     value += space[idx] ? 1 : 0;
   }
   return value;
 }
 
-boolean automaton(int[] kernel, boolean[] space) {
-  int value = evalKernel(kernel, space);
+boolean automaton(int[] neighborhood, boolean[] space) {
+  int value = evalNeighborhood(neighborhood, space);
   final int b111 = 0b111;
   final int b110 = 0b110;
   final int b101 = 0b101;
@@ -133,7 +133,7 @@ void setup() {
   for (int plane = 1; plane < NUM_GENERATIONS; plane++) {
     for (int row = 0; row < SIZE; row++) {
       for (int col = 0; col < SIZE; col++) {
-        int[] kernel = genKernel2D(col, row, SIZE);
+        int[] kernel = neighborhood2D(col, row, SIZE);
         boolean val = automaton2(kernel, cells[plane-1]);
         cells[plane][row * SIZE + col] = val;
       }

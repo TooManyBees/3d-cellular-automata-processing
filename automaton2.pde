@@ -9,8 +9,8 @@ int sumBits(int value) {
   return number;
 }
 
-boolean automaton2(int[] kernel, boolean[] space) {
-  int value = evalKernel(kernel, space);
+boolean automaton2(int[] neighborhood, boolean[] space) {
+  int value = evalNeighborhood(neighborhood, space);
   int numBits = sumBits(value);
   return (numBits > 2) && (numBits < 8);
 }
