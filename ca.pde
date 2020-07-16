@@ -2,7 +2,7 @@ static final int SIZE = 16;
 static final int NUM_GENERATIONS = 64;
 static final int BOX_SIZE = 1;
 
-boolean[][] cells = new boolean[NUM_GENERATIONS][SIZE*SIZE];
+Cell[][] cells = new Cell[NUM_GENERATIONS][SIZE*SIZE];
 
 // int bool2int(boolean left, boolean center, boolean right) {
 //   int res = 0;
@@ -73,46 +73,46 @@ int[] neighborhood1D(int x, int size) {
   return res;
 }
 
-int evalNeighborhood(int[] neighborhood, boolean[] space) {
+int evalNeighborhood(int[] neighborhood, Cell[] space) {
   int value = 0;
   for (int idx : neighborhood) {
     value = value << 1;
-    value += space[idx] ? 1 : 0;
+    value += space[idx].alive() ? 1 : 0;
   }
   return value;
 }
 
-boolean automaton(int[] neighborhood, boolean[] space) {
-  int value = evalNeighborhood(neighborhood, space);
-  final int b111 = 0b111;
-  final int b110 = 0b110;
-  final int b101 = 0b101;
-  final int b100 = 0b100;
-  final int b011 = 0b011;
-  final int b010 = 0b010;
-  final int b001 = 0b001;
-  final int b000 = 0b000;
-  switch(value) {
-  case b111:
-    return false;
-  case b110:
-    return false;
-  case b101:
-    return false;
-  case b100:
-    return true;
-  case b011:
-    return true;
-  case b010:
-    return true;
-  case b001:
-    return true;
-  case b000:
-    return false;
-  default:
-    return false;
-  }
-}
+// boolean automaton(int[] neighborhood, boolean[] space) {
+//   int value = evalNeighborhood(neighborhood, space);
+//   final int b111 = 0b111;
+//   final int b110 = 0b110;
+//   final int b101 = 0b101;
+//   final int b100 = 0b100;
+//   final int b011 = 0b011;
+//   final int b010 = 0b010;
+//   final int b001 = 0b001;
+//   final int b000 = 0b000;
+//   switch(value) {
+//   case b111:
+//     return false;
+//   case b110:
+//     return false;
+//   case b101:
+//     return false;
+//   case b100:
+//     return true;
+//   case b011:
+//     return true;
+//   case b010:
+//     return true;
+//   case b001:
+//     return true;
+//   case b000:
+//     return false;
+//   default:
+//     return false;
+//   }
+// }
 
 void reorientCamera(int generation) {
   camera(
@@ -135,13 +135,13 @@ void setup() {
 
   println("computing");
   for (int i = 0; i < SIZE * SIZE; i++) {
-    cells[0][i] = int(random(0, 2)) == 1;
+    cells[0][i] = new Cell(int(random(0, 2)) == 1, 1, 0);
   }
   for (int plane = 1; plane < NUM_GENERATIONS; plane++) {
     for (int row = 0; row < SIZE; row++) {
       for (int col = 0; col < SIZE; col++) {
         int[] kernel = neighborhood2D(col, row, SIZE);
-        boolean val = automaton2(kernel, cells[plane-1]);
+        Cell val = automaton2(kernel, cells[plane-1]);
         cells[plane][row * SIZE + col] = val;
       }
     }
@@ -175,11 +175,13 @@ void draw3D(int generation) {
   for (int plane = 0; plane <= generation; plane++) {
     for (int row = 0; row < SIZE; row++) {
       for (int col = 0; col < SIZE; col++) {
-        if (cells[plane][row*SIZE+col]) {
+        Cell cell = cells[plane][row*SIZE+col];
+        if (cell.alive()) {
           pushMatrix();
           rotateZ((float(mouseX)/512.0 - 256.0) * PI * -1);
           translate(BOX_SIZE * SIZE / -2, BOX_SIZE * SIZE / -2);
           translate(BOX_SIZE * row, BOX_SIZE * col, BOX_SIZE * plane);
+          fill(cell.fill());
           box(BOX_SIZE);
           popMatrix();
         }
@@ -192,7 +194,7 @@ void draw2D(int plane) {
   loadPixels();
   for (int row = 0; row < SIZE; row++) {
     for (int col = 0; col < SIZE; col++) {
-      pixels[row*SIZE+col] = cells[plane][row*SIZE+col] ? color(0) : color(255);
+      pixels[row*SIZE+col] = cells[plane][row*SIZE+col].alive() ? color(0) : color(255);
     }
   }
   updatePixels();

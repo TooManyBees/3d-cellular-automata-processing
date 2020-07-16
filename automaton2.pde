@@ -9,8 +9,15 @@ int sumBits(int value) {
   return number;
 }
 
-boolean automaton2(int[] neighborhood, boolean[] space) {
+Cell automaton2(int[] neighborhood, Cell[] space) {
   int value = evalNeighborhood(neighborhood, space);
   int numBits = sumBits(value);
-  return (numBits > 2) && (numBits < 8);
+  boolean alive = (numBits > 3) && (numBits < 8);
+  int age = 0;
+  if (alive) {
+    int previousIndex = neighborhood[neighborhood.length/2+1];
+    Cell previousCell = space[previousIndex];
+    age = previousCell.age() + 1;
+  }
+  return new Cell(alive, age, numBits);
 }
